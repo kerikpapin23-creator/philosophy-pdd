@@ -42,6 +42,13 @@ button {
   <button class="small" onclick="toggleTheme()">🌙</button>
 </div>
 
+<div class="card" style="margin-bottom:10px;text-align:center;">
+  <b>📊 Статистика</b><br>
+  Ответов: <span id="sAnswered">0</span><br>
+  Верных: <span id="sCorrect">0</span><br>
+  Процент: <span id="sPercent">0%</span>
+</div>
+
 <div class="card">
   <div class="term" id="term"></div>
   <div id="answers"></div>
@@ -137,6 +144,11 @@ const allQuestions = [
 // ===== ЛОГИКА =====
 let questions=[], index=0, answered=false;
 let mode="learn", correctCount=0;
+let stats = JSON.parse(localStorage.getItem("stats")) || {
+  answered: 0,
+  correct: 0
+};
+
 
 function shuffle(array) {
   const arr = [...array];
@@ -190,12 +202,20 @@ function load(){
     b.onclick=()=>answer(b,i);
     a.appendChild(b);
   });
+  document.getElementById("sAnswered").textContent = stats.answered;
+  document.getElementById("sCorrect").textContent = stats.correct;
+  document.getElementById("sPercent").textContent =
+  stats.answered ? Math.round(stats.correct / stats.answered * 100) + "%" : "0%";
+
 }
 
 function answer(btn,i){
   if(answered) return;
   answered=true;
   const q=questions[index];
+  stats.answered++;
+  if(i===q.correct) stats.correct++;
+  localStorage.setItem("stats", JSON.stringify(stats));
   document.querySelectorAll("#answers button").forEach((b,j)=>{
     b.disabled=true;
     if(j===q.correct) b.classList.add("correct");
@@ -207,6 +227,7 @@ function answer(btn,i){
 }
 
 function nextQuestion(){
+  if(!answered) return;
   index++;
   if(mode==="exam" && index===questions.length){
     alert(`Экзамен окончен\nПравильных: ${correctCount} из 20\n`+
