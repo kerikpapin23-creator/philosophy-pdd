@@ -4,205 +4,198 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Философия — билеты</title>
-
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
 :root {
-  --bg: #f2f2f7;
-  --card: #ffffff;
-  --text: #000000;
-  --button: #007aff;
-  --correct: #34c759;
-  --wrong: #ff3b30;
+  --bg:#f2f2f7; --card:#fff; --text:#000;
+  --button:#007aff; --correct:#34c759; --wrong:#ff3b30;
 }
-
 .dark {
-  --bg: #1c1c1e;
-  --card: #2c2c2e;
-  --text: #ffffff;
-  --button: #0a84ff;
+  --bg:#1c1c1e; --card:#2c2c2e; --text:#fff; --button:#0a84ff;
 }
-
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  padding: 20px;
+  font-family:-apple-system,sans-serif;
+  background:var(--bg); color:var(--text); padding:20px;
 }
-
-.card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-}
-
-.term {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
+.card { background:var(--card); border-radius:16px; padding:20px; }
+.term { font-size:26px; font-weight:700; text-align:center; margin-bottom:20px; }
 button {
-  width: 100%;
-  padding: 14px;
-  margin: 8px 0;
-  font-size: 16px;
-  border-radius: 12px;
-  border: none;
-  background: var(--button);
-  color: white;
+  width:100%; padding:14px; margin:6px 0;
+  border:none; border-radius:12px; font-size:16px;
+  background:var(--button); color:#fff;
 }
-
-button.correct { background: var(--correct); }
-button.wrong { background: var(--wrong); }
-button:disabled { opacity: 0.8; }
-
-#result {
-  text-align: center;
-  font-size: 20px;
-  margin-top: 15px;
-}
-
-#next {
-  margin-top: 20px;
-  background: #8e8e93;
-}
-
-.counter {
-  text-align: center;
-  margin-top: 10px;
-  opacity: 0.7;
-}
-
-.theme-toggle {
-  text-align: right;
-  margin-bottom: 10px;
-}
-
-.theme-toggle button {
-  width: auto;
-  padding: 6px 12px;
-  font-size: 14px;
-  background: none;
-  color: var(--text);
-}
+.correct{background:var(--correct);}
+.wrong{background:var(--wrong);}
+#result{text-align:center;font-size:20px;margin-top:10px;}
+.top { display:flex; gap:8px; margin-bottom:10px; }
+.small { font-size:14px; padding:8px; }
+.counter { text-align:center; opacity:.7; margin-top:8px; }
 </style>
 </head>
 
 <body>
 
-<div class="theme-toggle">
-  <button onclick="toggleTheme()">🌙 / ☀️</button>
+<div class="top">
+  <button class="small" onclick="startLearn()">📚 Учить</button>
+  <button class="small" onclick="startExam()">🎓 Экзамен (20)</button>
+  <button class="small" onclick="toggleTheme()">🌙</button>
 </div>
 
 <div class="card">
   <div class="term" id="term"></div>
   <div id="answers"></div>
   <div id="result"></div>
-  <button id="next" onclick="nextQuestion()" style="display:none;">
-    Следующий термин
-  </button>
+  <button id="next" onclick="nextQuestion()" style="display:none;">Далее</button>
   <div class="counter" id="counter"></div>
 </div>
 
 <script>
-// === ТЕМЫ ===
-function toggleTheme() {
+// ===== ТЕМА =====
+function toggleTheme(){
   document.body.classList.toggle("dark");
-  localStorage.setItem("theme",
-    document.body.classList.contains("dark") ? "dark" : "light"
-  );
+  localStorage.setItem("theme",document.body.classList.contains("dark"));
 }
-
-if (localStorage.getItem("theme") === "dark") {
+if(localStorage.getItem("theme")==="true")
   document.body.classList.add("dark");
-}
 
-// === ВОПРОСЫ ===
-const questions = [
-{ term:"Онтология", answers:["Учение о бытии","Учение о познании","Учение о морали"], correct:0 },
-{ term:"Гносеология", answers:["Учение о познании","Учение о бытии","Учение о красоте"], correct:0 },
-{ term:"Метафизика", answers:["Учение о предельных основаниях реальности","Учение о морали","Учение о языке"], correct:0 },
-{ term:"Диалектика", answers:["Учение о развитии через противоречия","Учение о душе","Учение о законах логики"], correct:0 },
-{ term:"Этика", answers:["Учение о морали","Учение о красоте","Учение о государстве"], correct:0 },
+// ===== ВСЕ ТЕРМИНЫ =====
+const allQuestions = [
+{term:"Онтология",answers:["Учение о бытии","Учение о морали","Учение о познании"],correct:0},
+{term:"Гносеология",answers:["Учение о познании","Учение о бытии","Учение о языке"],correct:0},
+{term:"Метафизика",answers:["Учение о предельных основаниях реальности","Учение о морали","Учение о культуре"],correct:0},
+{term:"Диалектика",answers:["Учение о развитии через противоречия","Учение о душе","Учение о логике"],correct:0},
+{term:"Этика",answers:["Учение о морали","Учение о красоте","Учение о природе"],correct:0},
 
-{ term:"Теоцентризм", answers:["Бог как центр бытия","Человек как центр мира","Природа как абсолют"], correct:0 },
-{ term:"Провиденциализм", answers:["История как проявление божественного замысла","История как хаос","История как экономический процесс"], correct:0 },
-{ term:"Пантеизм", answers:["Отождествление Бога и природы","Отрицание Бога","Бог вне мира"], correct:0 },
-{ term:"Гуманизм", answers:["Признание ценности человека","Отрицание личности","Превосходство государства"], correct:0 },
-{ term:"Агностицизм", answers:["Непознаваемость сущности мира","Абсолютное знание","Религиозная вера"], correct:0 },
+{term:"Архэ",answers:["Первоначало всего сущего","Форма познания","Социальный закон"],correct:0},
+{term:"Эйдос",answers:["Идеальная сущность вещи","Материальный объект","Чувственный образ"],correct:0},
+{term:"Автаркия",answers:["Самодостаточность","Аскетизм","Безразличие"],correct:0},
+{term:"Эпохе",answers:["Воздержание от суждений","Состояние экстаза","Форма логики"],correct:0},
+{term:"Атараксия",answers:["Душевное спокойствие","Интеллектуальный экстаз","Рациональное мышление"],correct:0},
 
-{ term:"Релятивизм", answers:["Относительность истины","Абсолютная истина","Научный метод"], correct:0 },
-{ term:"Деизм", answers:["Бог — творец, не вмешивающийся в мир","Бог тождествен природе","Отрицание Бога"], correct:0 },
-{ term:"Скептицизм", answers:["Сомнение в достоверности знания","Вера в разум","Религиозное учение"], correct:0 },
-{ term:"Экстаз", answers:["Выход за пределы обычного сознания","Рациональное мышление","Логический вывод"], correct:0 },
-{ term:"Монада", answers:["Неделимая духовная субстанция","Материальная частица","Форма познания"], correct:0 },
+{term:"Добродетель",answers:["Устойчивое нравственное качество","Социальная роль","Инстинкт"],correct:0},
+{term:"Космоцентризм",answers:["Космос как центр бытия","Человек как центр","Бог как центр"],correct:0},
+{term:"Антропоцентризм",answers:["Человек как центр мира","Космос как абсолют","Бог как основа"],correct:0},
+{term:"Агностицизм",answers:["Непознаваемость сущности мира","Абсолютное знание","Религиозная вера"],correct:0},
+{term:"Релятивизм",answers:["Относительность истины","Абсолютная истина","Научный метод"],correct:0},
 
-{ term:"Воля", answers:["Способность к целенаправленному действию","Чувственное восприятие","Форма логики"], correct:0 },
-{ term:"Идолы разума", answers:["Ложные формы мышления","Категории разума","Истинные идеи"], correct:0 },
-{ term:"Реализм", answers:["Признание реальности универсалий","Отрицание универсалий","Скептицизм"], correct:0 },
-{ term:"Номинализм", answers:["Отрицание реальности универсалий","Признание идей","Материализм"], correct:0 },
-{ term:"Универсалия", answers:["Общее понятие","Единичная вещь","Чувственный образ"], correct:0 },
+{term:"Ревеляционизм",answers:["Откровение как источник истины","Рациональное знание","Опыт"],correct:0},
+{term:"Теоцентризм",answers:["Бог как центр бытия","Человек как центр","Природа как центр"],correct:0},
+{term:"Провиденциализм",answers:["История как божественный замысел","История как хаос","История как прогресс науки"],correct:0},
+{term:"Пантеизм",answers:["Отождествление Бога и природы","Отрицание Бога","Бог вне мира"],correct:0},
+{term:"Гуманизм",answers:["Ценность человеческой личности","Отрицание личности","Культ государства"],correct:0},
 
-{ term:"Креационизм", answers:["Учение о сотворении мира Богом","Отрицание Бога","Эволюционизм"], correct:0 },
-{ term:"Категории", answers:["Фундаментальные формы мышления","Социальные роли","Эмоциональные состояния"], correct:0 },
-{ term:"Нус", answers:["Разум как высшая способность","Телесное чувство","Форма материи"], correct:0 },
-{ term:"Сверхчеловек", answers:["Идеал преодоления человека","Религиозный идеал","Политический лидер"], correct:0 },
-{ term:"Сциентизм", answers:["Абсолютизация науки","Отрицание науки","Религиозное мировоззрение"], correct:0 }
+{term:"Рационализм",answers:["Разум — источник знания","Опыт — источник знания","Вера"],correct:0},
+{term:"Эмпиризм",answers:["Опыт — источник знания","Разум — источник знания","Интуиция"],correct:0},
+{term:"Афазия",answers:["Утрата речевой способности","Потеря памяти","Психическое расстройство"],correct:0},
+{term:"Апатия",answers:["Безразличие","Радость","Экстаз"],correct:0},
+{term:"Логос",answers:["Разумный закон бытия","Чувственный опыт","Моральная норма"],correct:0},
+
+{term:"Космос",answers:["Упорядоченная Вселенная","Хаос","Социальная система"],correct:0},
+{term:"Форма",answers:["Способ организации содержания","Материя","Эмоция"],correct:0},
+{term:"Эстетика",answers:["Философия прекрасного","Философия морали","Философия науки"],correct:0},
+{term:"Антропология",answers:["Философия человека","Философия общества","Философия природы"],correct:0},
+{term:"Атом",answers:["Неделимая первооснова материи","Форма сознания","Социальный элемент"],correct:0},
+
+{term:"Деизм",answers:["Бог — творец, не вмешивающийся в мир","Бог тождествен природе","Отрицание Бога"],correct:0},
+{term:"Скептицизм",answers:["Сомнение в достоверности знания","Абсолютная истина","Религиозная вера"],correct:0},
+{term:"Экстаз",answers:["Выход за пределы обычного сознания","Рациональный анализ","Логический вывод"],correct:0},
+{term:"Субстанция",answers:["Первооснова бытия","Форма познания","Социальный институт"],correct:0},
+{term:"Индукция",answers:["От частного к общему","От общего к частному","По аналогии"],correct:0},
+
+{term:"Дедукция",answers:["От общего к частному","От частного к общему","Через опыт"],correct:0},
+{term:"Рефлексия",answers:["Осмысление собственных мыслей","Чувственное восприятие","Физическое действие"],correct:0},
+{term:"Априоризм",answers:["Знание независимо от опыта","Знание через опыт","Интуиция"],correct:0},
+{term:"Трансцендентализм",answers:["Учение об условиях познания","Материализм","Эмпиризм"],correct:0},
+{term:"Идеализм",answers:["Первичность сознания","Первичность материи","Отрицание реальности"],correct:0},
+
+{term:"Материализм",answers:["Первичность материи","Первичность сознания","Равенство"],correct:0},
+{term:"Вещь в себе",answers:["Объект вне познавательного опыта","Явление","Категория"],correct:0},
+{term:"Онтологический аргумент",answers:["Доказательство бытия Бога из понятия","Эмпирическое доказательство","Индукция"],correct:0},
+{term:"Логика",answers:["Наука о законах мышления","Наука о морали","Наука о культуре"],correct:0},
+{term:"Монада",answers:["Неделимая духовная субстанция","Материальный атом","Категория"],correct:0},
+
+{term:"Воля",answers:["Способность к целенаправленному действию","Чувственное восприятие","Форма мышления"],correct:0},
+{term:"Идолы разума",answers:["Ложные формы мышления","Истинные идеи","Категории"],correct:0},
+{term:"Первоединое",answers:["Абсолютное начало бытия","Материя","Сознание"],correct:0},
+{term:"Реализм",answers:["Реальность универсалий","Отрицание универсалий","Скептицизм"],correct:0},
+{term:"Номинализм",answers:["Отрицание реальности универсалий","Признание идей","Материализм"],correct:0},
+
+{term:"Универсалия",answers:["Общее понятие","Единичная вещь","Чувственный образ"],correct:0},
+{term:"Креационизм",answers:["Сотворение мира Богом","Эволюционизм","Атеизм"],correct:0},
+{term:"Апония",answers:["Отсутствие телесной боли","Душевный покой","Экстаз"],correct:0},
+{term:"Категории",answers:["Фундаментальные формы мышления","Социальные роли","Эмоции"],correct:0},
+{term:"Нус",answers:["Разум как высшая способность","Чувство","Материя"],correct:0},
+
+{term:"Сверхчеловек",answers:["Идеал преодоления человека","Религиозный идеал","Политический лидер"],correct:0},
+{term:"Душа",answers:["Нематериальный принцип жизни","Физиологический процесс","Социальная роль"],correct:0},
+{term:"Социальная философия",answers:["Философия общества","Философия природы","Философия искусства"],correct:0},
+{term:"Сциентизм",answers:["Абсолютизация науки","Отрицание науки","Религиозное мировоззрение"],correct:0},
+{term:"Иррационализм",answers:["Приоритет воли и чувств","Приоритет разума","Приоритет науки"],correct:0}
 ];
 
-let current = 0;
-let answered = false;
+// ===== ЛОГИКА =====
+let questions=[], index=0, answered=false;
+let mode="learn", correctCount=0;
 
-function loadQuestion() {
-  answered = false;
-  document.getElementById("result").textContent = "";
-  document.getElementById("next").style.display = "none";
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-  const q = questions[current];
-  document.getElementById("term").textContent = q.term;
-  document.getElementById("counter").textContent =
-    `Термин ${current + 1} из ${questions.length}`;
+function startLearn(){
+  mode="learn";
+  questions=shuffle([...allQuestions]);
+  index=0; load();
+}
+function startExam(){
+  mode="exam";
+  questions=shuffle([...allQuestions]).slice(0,20);
+  index=0; correctCount=0; load();
+}
 
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = "";
-
-  q.answers.forEach((text, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = text;
-    btn.onclick = () => selectAnswer(btn, index);
-    answersDiv.appendChild(btn);
+function load(){
+  answered=false;
+  document.getElementById("result").textContent="";
+  document.getElementById("next").style.display="none";
+  const q=questions[index];
+  document.getElementById("term").textContent=q.term;
+  document.getElementById("counter").textContent=
+    mode==="exam"?`Вопрос ${index+1} из 20`:`Термин ${index+1}`;
+  const a=document.getElementById("answers");
+  a.innerHTML="";
+  q.answers.forEach((t,i)=>{
+    const b=document.createElement("button");
+    b.textContent=t;
+    b.onclick=()=>answer(b,i);
+    a.appendChild(b);
   });
 }
 
-function selectAnswer(button, index) {
-  if (answered) return;
-  answered = true;
-
-  const q = questions[current];
-  const buttons = document.querySelectorAll("#answers button");
-
-  buttons.forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === q.correct) btn.classList.add("correct");
-    if (i === index && i !== q.correct) btn.classList.add("wrong");
+function answer(btn,i){
+  if(answered) return;
+  answered=true;
+  const q=questions[index];
+  document.querySelectorAll("#answers button").forEach((b,j)=>{
+    b.disabled=true;
+    if(j===q.correct) b.classList.add("correct");
+    if(j===i && j!==q.correct) b.classList.add("wrong");
   });
-
-  document.getElementById("result").textContent =
-    index === q.correct ? "✅ Верно" : "❌ Неверно";
-
-  document.getElementById("next").style.display = "block";
+  if(i===q.correct) correctCount++;
+  document.getElementById("result").textContent=i===q.correct?"✅ Верно":"❌ Неверно";
+  document.getElementById("next").style.display="block";
 }
 
-function nextQuestion() {
-  current = (current + 1) % questions.length;
-  loadQuestion();
+function nextQuestion(){
+  index++;
+  if(mode==="exam" && index===questions.length){
+    alert(`Экзамен окончен\nПравильных: ${correctCount} из 20\n`+
+          (correctCount>=17?"✅ СДАЛ":"❌ НЕ СДАЛ"));
+    startLearn(); return;
+  }
+  if(index>=questions.length) index=0;
+  load();
 }
 
-loadQuestion();
+// старт
+startLearn();
 </script>
 
 </body>
