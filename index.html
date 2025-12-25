@@ -147,6 +147,20 @@ function shuffle(array) {
   return arr;
 }
 
+function shuffleAnswers(question) {
+  const paired = question.answers.map((text, index) => ({
+    text,
+    isCorrect: index === question.correct
+  }));
+
+  for (let i = paired.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [paired[i], paired[j]] = [paired[j], paired[i]];
+  }
+
+  question.answers = paired.map(p => p.text);
+  question.correct = paired.findIndex(p => p.isCorrect);
+}
 
 function startLearn(){
   mode="learn";
@@ -164,6 +178,7 @@ function load(){
   document.getElementById("result").textContent="";
   document.getElementById("next").style.display="none";
   const q=questions[index];
+  shuffleAnswers(q);
   document.getElementById("term").textContent=q.term;
   document.getElementById("counter").textContent=
     mode==="exam"?`Вопрос ${index+1} из 20`:`Термин ${index+1}`;
