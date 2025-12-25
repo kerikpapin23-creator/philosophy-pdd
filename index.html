@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Философия — билеты</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f2f2f7;
+  padding: 20px;
+}
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.term {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+button {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 12px;
+  border: none;
+  background: #007aff;
+  color: white;
+}
+button.correct { background: #34c759; }
+button.wrong { background: #ff3b30; }
+button:disabled { opacity: 0.7; }
+#result {
+  text-align: center;
+  font-size: 20px;
+  margin-top: 15px;
+}
+#next {
+  margin-top: 20px;
+  background: #8e8e93;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="term" id="term"></div>
+
+  <div id="answers"></div>
+
+  <div id="result"></div>
+
+  <button id="next" onclick="nextQuestion()" style="display:none;">
+    Следующий термин
+  </button>
+</div>
+
+<script>
+const questions = [
+  {
+    term: "Онтология",
+    answers: [
+      "Учение о бытии",
+      "Учение о морали",
+      "Учение о познании"
+    ],
+    correct: 0
+  },
+  {
+    term: "Гносеология",
+    answers: [
+      "Учение о государстве",
+      "Учение о познании",
+      "Учение о красоте"
+    ],
+    correct: 1
+  },
+  {
+    term: "Этика",
+    answers: [
+      "Учение о прекрасном",
+      "Учение о бытии",
+      "Учение о морали"
+    ],
+    correct: 2
+  }
+];
+
+let current = 0;
+let answered = false;
+
+function loadQuestion() {
+  answered = false;
+  document.getElementById("result").textContent = "";
+  document.getElementById("next").style.display = "none";
+
+  const q = questions[current];
+  document.getElementById("term").textContent = q.term;
+
+  const answersDiv = document.getElementById("answers");
+  answersDiv.innerHTML = "";
+
+  q.answers.forEach((text, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = text;
+    btn.onclick = () => selectAnswer(btn, index);
+    answersDiv.appendChild(btn);
+  });
+}
+
+function selectAnswer(button, index) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[current];
+  const buttons = document.querySelectorAll("#answers button");
+
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add("correct");
+    if (i === index && i !== q.correct) btn.classList.add("wrong");
+  });
+
+  document.getElementById("result").textContent =
+    index === q.correct ? "✅ Верно" : "❌ Неверно";
+
+  document.getElementById("next").style.display = "block";
+}
+
+function nextQuestion() {
+  current = (current + 1) % questions.length;
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
