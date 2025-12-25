@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Философия — билеты</title>
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
@@ -50,6 +48,11 @@ button:disabled { opacity: 0.7; }
   margin-top: 20px;
   background: #8e8e93;
 }
+.counter {
+  text-align: center;
+  margin-top: 10px;
+  color: #555;
+}
 </style>
 </head>
 
@@ -57,45 +60,45 @@ button:disabled { opacity: 0.7; }
 
 <div class="card">
   <div class="term" id="term"></div>
-
   <div id="answers"></div>
-
   <div id="result"></div>
-
   <button id="next" onclick="nextQuestion()" style="display:none;">
     Следующий термин
   </button>
+  <div class="counter" id="counter"></div>
 </div>
 
 <script>
 const questions = [
-  {
-    term: "Онтология",
-    answers: [
-      "Учение о бытии",
-      "Учение о морали",
-      "Учение о познании"
-    ],
-    correct: 0
-  },
-  {
-    term: "Гносеология",
-    answers: [
-      "Учение о государстве",
-      "Учение о познании",
-      "Учение о красоте"
-    ],
-    correct: 1
-  },
-  {
-    term: "Этика",
-    answers: [
-      "Учение о прекрасном",
-      "Учение о бытии",
-      "Учение о морали"
-    ],
-    correct: 2
-  }
+{ term:"Онтология", answers:["Учение о бытии","Учение о познании","Учение о морали"], correct:0 },
+{ term:"Гносеология", answers:["Учение о познании","Учение о бытии","Учение о прекрасном"], correct:0 },
+{ term:"Метафизика", answers:["Учение о предельных основаниях реальности","Учение о морали","Учение о языке"], correct:0 },
+{ term:"Диалектика", answers:["Учение о развитии через противоречия","Учение о душе","Учение о законах логики"], correct:0 },
+{ term:"Этика", answers:["Учение о морали","Учение о красоте","Учение о государстве"], correct:0 },
+
+{ term:"Архэ", answers:["Первоначало всего сущего","Форма государства","Метод познания"], correct:0 },
+{ term:"Эйдос", answers:["Идеальная сущность вещи","Материальная оболочка","Чувственный образ"], correct:0 },
+{ term:"Автаркия", answers:["Самодостаточность","Аскетизм","Безразличие"], correct:0 },
+{ term:"Эпохе", answers:["Воздержание от суждений","Состояние экстаза","Форма мышления"], correct:0 },
+{ term:"Атараксия", answers:["Душевное спокойствие","Религиозный экстаз","Форма логики"], correct:0 },
+
+{ term:"Добродетель", answers:["Устойчивое нравственное качество","Социальная роль","Природный инстинкт"], correct:0 },
+{ term:"Космоцентризм", answers:["Космос как центр бытия","Человек как центр мира","Бог как центр мира"], correct:0 },
+{ term:"Антропоцентризм", answers:["Человек как центр мира","Космос как основа","Бог как абсолют"], correct:0 },
+{ term:"Агностицизм", answers:["Отрицание познаваемости сущности мира","Вера в разум","Религиозное учение"], correct:0 },
+{ term:"Релятивизм", answers:["Относительность истины","Абсолютная истина","Божественное откровение"], correct:0 },
+
+{ term:"Рационализм", answers:["Разум — источник знания","Опыт — источник знания","Вера — источник знания"], correct:0 },
+{ term:"Эмпиризм", answers:["Опыт — источник знания","Разум — источник знания","Интуиция — источник знания"], correct:0 },
+{ term:"Логос", answers:["Разумный закон бытия","Чувственный опыт","Моральный принцип"], correct:0 },
+{ term:"Субстанция", answers:["Первооснова бытия","Форма познания","Социальная структура"], correct:0 },
+{ term:"Материализм", answers:["Первичность материи","Первичность сознания","Равенство материи и духа"], correct:0 },
+
+{ term:"Идеализм", answers:["Первичность сознания","Первичность материи","Отрицание реальности"], correct:0 },
+{ term:"Индукция", answers:["От частного к общему","От общего к частному","Через аналогию"], correct:0 },
+{ term:"Дедукция", answers:["От общего к частному","От частного к общему","Через опыт"], correct:0 },
+{ term:"Рефлексия", answers:["Осмысление собственных мыслей","Чувственное восприятие","Физическое действие"], correct:0 },
+{ term:"Иррационализм", answers:["Приоритет воли и чувств","Приоритет разума","Приоритет науки"], correct:0 }
 ];
 
 let current = 0;
@@ -108,6 +111,8 @@ function loadQuestion() {
 
   const q = questions[current];
   document.getElementById("term").textContent = q.term;
+  document.getElementById("counter").textContent =
+    `Термин ${current + 1} из ${questions.length}`;
 
   const answersDiv = document.getElementById("answers");
   answersDiv.innerHTML = "";
